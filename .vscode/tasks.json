@@ -1,0 +1,77 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run",
+            "type": "shell",
+            "command": "LOG_LEVEL=\"-1\" ./auth",
+            "problemMatcher": [],
+            "dependsOrder": "sequence",
+            "dependsOn": ["Build"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run Server",
+            "type": "shell",
+            "command": "LOG_LEVEL=\"-1\" ./auth server",
+            "problemMatcher": [],
+            "dependsOrder": "sequence",
+            "dependsOn": ["Build"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Auth Version",
+            "type": "shell",
+            "command": "./auth version | jq .",
+            "problemMatcher": [],
+            "dependsOrder": "sequence",
+            "dependsOn": ["Build"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build Container",
+            "type": "shell",
+            "command": "docker build -t auth .",
+            "problemMatcher": [],
+            "dependsOrder": "sequence",
+            "dependsOn": ["Build Linux"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run Container",
+            "type": "shell",
+            "command": "docker run -p 8000:8000 -it auth",
+            "problemMatcher": [],
+            "dependsOrder": "sequence",
+            "dependsOn": ["Build Container"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "go build -v -ldflags=\"-X 'github.com/dmatusiewicz/auth/cmd.commitId=`git rev-parse HEAD`' -X 'github.com/dmatusiewicz/auth/cmd.buildDate=`date +\"%D %T\"`' -X 'github.com/dmatusiewicz/auth/cmd.builder=`whoami`' \"",
+        },
+        {
+            "label": "Build Linux",
+            "type": "shell",
+            "command": "GOOS=linux go build -v -ldflags=\"-X 'github.com/dmatusiewicz/auth/cmd.commitId=`git rev-parse HEAD`' -X 'github.com/dmatusiewicz/auth/cmd.buildDate=`date +\"%D %T\"`' -X 'github.com/dmatusiewicz/auth/cmd.builder=`whoami`' \"",
+        } 
+    ]
+}
